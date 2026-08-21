@@ -5,6 +5,7 @@
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <LangVersion>preview</LangVersion>
     <AssemblyName>DeltaModbusExcelWriter</AssemblyName>
     <RootNamespace>DeltaModbusExcelWriter</RootNamespace>
     <ApplicationManifest>app.manifest</ApplicationManifest>
