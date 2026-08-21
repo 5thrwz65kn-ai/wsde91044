@@ -1,0 +1,63 @@
+name: Build Windows EXE
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - build/modbus-excel-writer
+    paths:
+      - "DeltaModbusExcelWriter/**"
+      - ".github/workflows/build-windows.yml"
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "DeltaModbusExcelWriter/**"
+      - ".github/workflows/build-windows.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Restore
+        run: dotnet restore DeltaModbusExcelWriter/DeltaModbusExcelWriter.csproj
+
+      - name: Publish single-file EXE
+        run: >
+          dotnet publish DeltaModbusExcelWriter/DeltaModbusExcelWriter.csproj
+          --configuration Release
+          --runtime win-x64
+          --self-contained true
+          --output publish
+          -p:PublishSingleFile=true
+          -p:IncludeNativeLibrariesForSelfExtract=true
+          -p:DebugSymbols=false
+          -p:DebugType=None
+
+      - name: Verify executable
+        shell: pwsh
+        run: |
+          $exe = Get-Item "publish/DeltaModbusExcelWriter.exe"
+          if ($exe.Length -lt 1MB) { throw "EXE output is unexpectedly small." }
+          Get-FileHash $exe.FullName -Algorithm SHA256
+          Get-ChildItem publish
+
+      - name: Upload EXE
+        uses: actions/upload-artifact@v4
+        with:
+          name: DeltaModbusExcelWriter-win-x64
+          path: publish/DeltaModbusExcelWriter.exe
+          if-no-files-found: error
+          retention-days: 30
