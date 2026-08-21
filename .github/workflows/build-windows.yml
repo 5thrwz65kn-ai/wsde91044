@@ -8,6 +8,12 @@ on:
     paths:
       - "DeltaModbusExcelWriter/**"
       - ".github/workflows/build-windows.yml"
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "DeltaModbusExcelWriter/**"
+      - ".github/workflows/build-windows.yml"
 
 permissions:
   contents: read
